@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 
 // Download Counter
-fetch('https://github.com/CatPaulKatze/VALORANT-rank-yoinker/releases')
+fetch('https://api.github.com/repos/CatPaulKatze/VALORANT-rank-yoinker/releases')
     .then(response => response.json())
     .then(data => process_data(data));
 
