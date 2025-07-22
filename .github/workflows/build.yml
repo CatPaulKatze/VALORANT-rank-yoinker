@@ -12,12 +12,6 @@ on:
     types: [review_requested]
 
 jobs:
-  specific_review_requested:
-    
-    runs-on: windows-latest
-    steps: 
-      - run: echo 'A review was requested from the devs'
-      
   build:
   
     runs-on: windows-latest
