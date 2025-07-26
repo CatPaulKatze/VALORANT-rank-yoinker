@@ -1,7 +1,4 @@
-
-
-
-
+from collections import defaultdict
 
 class Menu:
     def __init__(self, Requests, log, presences):
@@ -9,28 +6,54 @@ class Menu:
         self.log = log
         self.presences = presences
 
-    def get_party_json(self, GamePlayersPuuid, presencesDICT):
-        party_json = {}
-        for presence in presencesDICT:
-            if presence["puuid"] in GamePlayersPuuid:
-                decodedPresence = self.presences.decode_presence(presence["private"])
-                if decodedPresence["isValid"]:
-                    if decodedPresence["partySize"] > 1:
-                        try:
-                            party_json[decodedPresence["partyId"]].append(presence["puuid"])
-                        except KeyError:
-                            party_json.update({decodedPresence["partyId"]: [presence["puuid"]]})
+    def get_party_json(self, GamePlayersPuuid):
+        partyOBJ = []
+        for puuid in GamePlayersPuuid:
+            history = self.Requests.fetch(url_type="pd", endpoint=f"/match-history/v1/history/{puuid}?startIndex=0&endIndex=2&queue=competitive", method="GET").json()
+            for matches in history["History"]:
+                matchID = matches["MatchID"]
+                match = self.Requests.fetch(url_type="pd", endpoint=f"/match-details/v1/matches/{matchID}", method="get").json()
 
-        #remove non-in-game parties from with one player in game
-        parties_to_delete = []
-        for party in party_json:
-            if len(party_json[party]) == 1:
-                parties_to_delete.append(party)
-        for party in parties_to_delete:
-            del party_json[party]
+                partyIDs = []
+                for player in match["players"]:
+                    partyIDs.extend([{
+                        "puuid": player["subject"],
+                        "partyID": player["partyId"]
+                    }])
 
-        self.log(f"retrieved party json: {party_json}")
-        return party_json
+                party_map = defaultdict(list)
+                for entry in partyIDs:
+                    party_map[entry["partyID"]].append(entry["puuid"])
+
+                parties = [puuids for puuids in party_map.values() if len(puuids) > 1]
+                playerParty = [puuids for puuids in parties if puuid in puuids]
+                partyOBJ.extend(playerParty)
+
+        player_connections = defaultdict(set)
+        for party in partyOBJ:
+            for player in party:
+                player_connections[player].update(party)
+
+        combined_parties = []
+        seen_players = set()
+
+        for player in player_connections:
+            if player not in seen_players:
+                connected_players = set()
+                to_check = {player}
+
+                while to_check:
+                    current = to_check.pop()
+                    if current not in connected_players:
+                        connected_players.add(current)
+                        to_check.update(player_connections[current] - connected_players)
+
+                players_in_game = [p for p in connected_players if p in GamePlayersPuuid]
+                if len(players_in_game) >= 2:
+                    combined_parties.append(list(connected_players))
+                seen_players.update(connected_players)
+
+        return combined_parties
 
     def get_party_members(self, self_puuid, presencesDICT):
         res = []

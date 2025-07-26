@@ -288,9 +288,12 @@ try:
                 playersLoaded = 1
 
                 heartbeat_data["map"] = (map_urls[coregame_stats["MapID"].lower()],)
-                with richConsole.status("Loading Players...") as status:
-                    partyOBJ = menu.get_party_json(
-                        namesClass.get_players_puuid(Players), presence
+                with richConsole.status("Loading party list") as status:
+                    partyOBJ = []
+                    if cfg.table.get("party", True):
+                        partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players))
+                    status.update(
+                        f"Loading players..."
                     )
                     # log(f"retrieved names dict: {names}")
                     Players.sort(
@@ -376,18 +379,15 @@ try:
                         party_icon = ""
                         # set party premade icon
                         for party in partyOBJ:
-                            if player["Subject"] in partyOBJ[party]:
-                                if party not in partyIcons:
-                                    partyIcons.update(
-                                        {party: PARTYICONLIST[partyCount]}
-                                    )
-                                    # PARTY_ICON
-                                    party_icon = PARTYICONLIST[partyCount]
+                            party_key = tuple(party)
+                            if player["Subject"] in party_key:
+                                if party_key not in partyIcons:
+                                    partyIcons.update({party_key: PARTYICONLIST[partyCount % len(PARTYICONLIST)]})
+                                    party_icon = PARTYICONLIST[partyCount % len(PARTYICONLIST)]
                                     partyNum = partyCount + 1
-                                    partyCount += 1
                                 else:
-                                    # PARTY_ICON
-                                    party_icon = partyIcons[party]
+                                    party_icon = partyIcons[party_key]
+                                partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         previousPlayerRank = rank.get_rank(
                             player["Subject"], previousSeasonID
@@ -601,12 +601,15 @@ try:
                 # loadouts = loadoutsClass.get_match_loadouts(pregame.get_pregame_match_id(), pregame_stats, cfg.weapon, valoApiSkins, names,
                 #   state="pregame")
                 playersLoaded = 1
-                with richConsole.status("Loading Players...") as status:
+                with richConsole.status("Loading party list") as status:
+                    partyOBJ = []
+                    if cfg.table.get("party", True):
+                        partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players))
+                    status.update(
+                        f"Loading players..."
+                    )
                     # with alive_bar(total=len(Players), title='Fetching Players', bar='classic2') as bar:
                     presence = presences.get_presence()
-                    partyOBJ = menu.get_party_json(
-                        namesClass.get_players_puuid(Players), presence
-                    )
                     partyMembers = menu.get_party_members(Requests.puuid, presence)
                     partyMembersList = [a["Subject"] for a in partyMembers]
                     # log(f"retrieved names dict: {names}")
@@ -627,17 +630,14 @@ try:
 
                         # set party premade icon
                         for party in partyOBJ:
-                            if player["Subject"] in partyOBJ[party]:
-                                if party not in partyIcons:
-                                    partyIcons.update(
-                                        {party: PARTYICONLIST[partyCount]}
-                                    )
-                                    # PARTY_ICON
-                                    party_icon = PARTYICONLIST[partyCount]
+                            party_key = tuple(party)
+                            if player["Subject"] in party_key:
+                                if party_key not in partyIcons:
+                                    partyIcons.update({party_key: PARTYICONLIST[partyCount % len(PARTYICONLIST)]})
+                                    party_icon = PARTYICONLIST[partyCount % len(PARTYICONLIST)]
                                     partyNum = partyCount + 1
                                 else:
-                                    # PARTY_ICON
-                                    party_icon = partyIcons[party]
+                                    party_icon = partyIcons[party_key]
                                 partyCount += 1
                         playerRank = rank.get_rank(player["Subject"], seasonID)
                         previousPlayerRank = rank.get_rank(

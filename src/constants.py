@@ -1,7 +1,7 @@
 import requests
 from colr import color
 
-version = "2.83"
+version = "2.84"
 enablePrivateLogging = True
 hide_names = False
 hide_levels = False
@@ -468,6 +468,7 @@ DEFAULT_CONFIG = {
         "weapon": "Vandal",
         "chat_limit": 5,
         "table": {
+            "party": False,
             "skin": True,
             "rr": True,
             "earned_rr": True,
