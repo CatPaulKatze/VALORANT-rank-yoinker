@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - 'main'
+      - "main-source"
     
   pull_request:
     types: [review_requested]
