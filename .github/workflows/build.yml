@@ -8,6 +8,7 @@ on:
     branches:
       - 'main'
       - "main-source"
+  workflow_dispatch:
     
   pull_request:
     types: [review_requested]
