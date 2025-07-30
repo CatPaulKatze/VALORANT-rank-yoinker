@@ -123,7 +123,7 @@ try:
 
     current_map = coregame.get_current_map(map_urls, map_splashes)
 
-    colors = Colors(hide_names, agent_dict, AGENTCOLORLIST)
+    colors = Colors(cfg.get_table_flag("party"), agent_dict, AGENTCOLORLIST)
 
     loadoutsClass = Loadouts(Requests, log, colors, Server, current_map)
     table = Table(cfg, log)
@@ -135,7 +135,7 @@ try:
     else:
         rpc = None
 
-    Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, Server, rpc)
+    Wss = Ws(Requests.lockfile, Requests, cfg, colors, cfg.get_feature_flag("hide_names"), Server, rpc)
     # loop = asyncio.new_event_loop()
     # asyncio.set_event_loop(loop)
     # loop.run_forever()
@@ -290,7 +290,7 @@ try:
                 heartbeat_data["map"] = (map_urls[coregame_stats["MapID"].lower()],)
                 with richConsole.status("Loading party list") as status:
                     partyOBJ = []
-                    if cfg.table.get("party", True):
+                    if cfg.get_table_flag("party"):
                         partyOBJ = menu.get_party_json(namesClass.get_players_puuid(Players))
                     status.update(
                         f"Loading players..."
@@ -452,7 +452,7 @@ try:
                             if (
                                 player["Subject"] == Requests.puuid
                                 or player["Subject"] in partyMembersList
-                                or hide_levels == False
+                                or cfg.get_feature_flag("hide_levels") == False
                             ):
                                 PLcolor = colors.level_to_color(player_level)
                             else:
@@ -699,7 +699,7 @@ try:
                             if (
                                 player["Subject"] == Requests.puuid
                                 or player["Subject"] in partyMembersList
-                                or hide_levels == False
+                                or cfg.get_feature_flag("hide_levels") == False
                             ):
                                 PLcolor = colors.level_to_color(player_level)
                             else:

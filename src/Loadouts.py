@@ -1,8 +1,9 @@
 import time
 import requests
 from colr import color
-from src.constants import sockets, hide_names
-import json
+
+from src.config import Config
+from src.constants import sockets
 
 
 class Loadouts:
@@ -13,6 +14,7 @@ class Loadouts:
         self.colors = colors
         self.Server = Server
         self.current_map = current_map
+        self.cfg = Config(log)
 
     def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
         playersBackup = players
@@ -79,7 +81,7 @@ class Loadouts:
                 )
 
                 #creates name field
-                if hide_names:
+                if self.cfg.flags.get("hide_names", True):
                     for agent in valoApiAgents.json()["data"]:
                         if agent["uuid"] == players[i]["CharacterID"]:
                             final_json[players[i]["Subject"]].update({"Name": agent["displayName"]})
