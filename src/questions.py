@@ -2,6 +2,7 @@ from InquirerPy.base.control import Choice
 from src.constants import DEFAULT_CONFIG, WEAPONS
 
 TABLE_OPTS = {
+    "party": "Party list (EXPERIMENTAL, could rate limit you for a couple of seconds and loading could take longer)",
     "skin": "Skin",
     "rr": "Ranked Rating",
     "earned_rr": "RR gained or lost (and AFK Penalties)",
@@ -15,6 +16,8 @@ TABLE_OPTS = {
 }
 
 FLAGS_OPTS = {
+    "hide_names": "Hide hidden players names",
+    "hide_levels": "Hide hidden players levels",
 	"last_played": "Last Played Stats",
 	"auto_hide_leaderboard": "Auto Hide Leaderboard Column",
     "pre_cls": "Pre-Clear Screen",
@@ -22,7 +25,6 @@ FLAGS_OPTS = {
     "peak_rank_act": "Peak Rank Act",
     "discord_rpc": "Discord Rich Presence",
     "aggregate_rank_rr": "Display Rank and Ranked Rating in the same column",
-    "server_id": "Show Server ID"
 }
 
 weapon_question = lambda config: {
