@@ -1,6 +1,6 @@
 from colr import color
 
-version = "2.84"
+version = "2.85"
 
 gamemodes = {
     "newmap": "New Map",
